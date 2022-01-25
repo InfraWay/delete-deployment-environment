@@ -104,7 +104,6 @@ async function deleteTheEnvironment(
 export async function main(): Promise<void> {
   let deleteDeployment = true;
   let deleteEnvironment = true;
-  const { context } = github;
   const token: string = core.getInput('token', { required: true });
   const environment: string = core.getInput('environment', { required: true });
   const onlyRemoveDeployments: string = core.getInput('onlyRemoveDeployments', {
@@ -116,6 +115,15 @@ export async function main(): Promise<void> {
       required: false,
     },
   );
+
+  const owner: string = core.getInput('owner', { required: false });
+  const repo: string = core.getInput('repo', { required: false });
+  const { repo: repoDefault, owner: ownerDefault } = github.context.repo;
+  const context = {
+    owner: owner || ownerDefault,
+    repo: repo || repoDefault,
+  };
+
   const client: Octokit = github.getOctokit(token, { previews: ['ant-man'] });
 
   if (onlyDeactivateDeployments === 'true') {
@@ -126,14 +134,14 @@ export async function main(): Promise<void> {
   }
   try {
     const deploymentIds = await listDeploymentIds(client, {
-      ...context.repo,
+      ...context,
       environment,
     });
     core.info(`Found ${deploymentIds.length} deployments`);
     core.info(`deactivating deployments in environment ${environment}`);
     await Promise.all(
       deploymentIds.map((deploymentId) =>
-        setDeploymentInactive(client, { ...context.repo, deploymentId }),
+        setDeploymentInactive(client, { ...context, deploymentId }),
       ),
     );
 
@@ -141,13 +149,13 @@ export async function main(): Promise<void> {
       core.info(`deleting deployments in environment ${environment}`);
       await Promise.all(
         deploymentIds.map((deploymentId) =>
-          deleteDeploymentById(client, { ...context.repo, deploymentId }),
+          deleteDeploymentById(client, { ...context, deploymentId }),
         ),
       );
     }
 
     if (deleteEnvironment) {
-      await deleteTheEnvironment(client, environment, context.repo);
+      await deleteTheEnvironment(client, environment, context);
     }
     core.info('done');
   } catch (error) {
