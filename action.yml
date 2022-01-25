@@ -11,6 +11,12 @@ inputs:
   environment:
     description: Environment to be deleted
     required: true
+  owner:
+    description: Owner name
+    required: false
+  repo:
+    description: repo name
+    required: false
   onlyRemoveDeployments:
     description: Only remove deployments, keep the environment. Defaults to false
     required: false
