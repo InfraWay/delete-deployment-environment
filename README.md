@@ -19,6 +19,8 @@ Also note that if you are planning on deleting a created environment, your `GITH
 | --------------------------- | --------------------------------------------------------------------------------------- |
 | `token`                     | GitHub token like `${{ github.token }}` or `${{ secrets.GITHUB_TOKEN }}`                |
 | `environment`               | The Name of the environment to delete                                                   |
+| `owner`                     | Owner of the repo                                                   |
+| `repo`                      | Repo name                                                   |
 | `onlyRemoveDeployments`     | Delete deployments and not the environment. Default `false`                             |
 | `onlyDeactivateDeployments` | Deactivate the deployments but don't remove deployments or environment. Default `false` |
 
